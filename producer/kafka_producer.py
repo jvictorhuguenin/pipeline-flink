@@ -25,7 +25,6 @@ def main():
     df.insert(0, 'scaled_amount', scaled_amount)
     df.insert(1, 'scaled_time', scaled_time)
 
-    df = df[df['Class'] == 1]
     df.drop('Class', inplace=True, axis=1)
 
     for _, row in df.iterrows():
