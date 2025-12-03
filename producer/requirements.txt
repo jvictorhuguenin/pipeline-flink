@@ -1,0 +1,7 @@
+kafka-python
+scikit-learn
+fastapi
+uvicorn
+apache-flink == 1.17.2
+joblib
+mysql-connector-python
