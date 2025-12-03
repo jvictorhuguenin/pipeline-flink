@@ -1,12 +1,14 @@
 from kafka import KafkaProducer
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import RobustScaler
+import hashlib
 import pandas as pd
 import time
 
 def main():
     producer = KafkaProducer(
         bootstrap_servers="localhost:9092",
-        value_serializer=lambda v: str(v).encode('utf-8')
+        value_serializer=lambda v: str(v).encode('utf-8'),
+        key_serializer=lambda k: k.encode("utf-8")
     )
 
     csv_path = "../creditcard.csv"
@@ -28,11 +30,18 @@ def main():
     df.drop('Class', inplace=True, axis=1)
 
     for _, row in df.iterrows():
-        # Converte a linha inteira para string JSON-like
         payload = row.to_json()
-        producer.send("input-topic", payload)
+
+        # Gera hash da mensagem para usar como key
+        key_hash = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+        producer.send(
+            "input-topic",
+            key=key_hash,
+            value=payload
+        )
         producer.flush()
-        time.sleep(0.1)  # opcional para simular streaming
+        time.sleep(0.1)
 
     print("Envio finalizado.")
 
